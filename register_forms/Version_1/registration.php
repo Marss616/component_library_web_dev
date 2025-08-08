@@ -25,6 +25,7 @@ require_once('config.php');
 
         $stmtinsert = $db->prepare($sql);
         $result = $stmtinsert->execute([$firstname, $lastname, $email, $phonenumber, $password]);
+        /*
         if($result){
             echo 'Successfully saved.';
         }
@@ -40,8 +41,11 @@ require_once('config.php');
         echo '<p>Phone Number: ' . htmlspecialchars($phonenumber) . '</p>';
         // Do not echo password in real apps! This is just for test:
         echo '<p>Password: ' . htmlspecialchars($password) . '</p>';
+        */
     }
+        
     ?>
+    
 </div>
 
 <div>
@@ -78,34 +82,55 @@ require_once('config.php');
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
-    $(function(){
-        $('#register').click(function(e){
-            e.preventDefault(); // Prevent form from submitting immediately
+$(function () {
+    $('#register').click(function (e) {
+        e.preventDefault(); // Prevent default form submission
 
-            var valid = this.form.checkValidity();
-            if(valid){
-                alert("form works");
-            } else {
-                alert("form does not work");
-            }
+        // Check form validity
+        var valid = document.getElementById('registrationForm').checkValidity();
 
-            var firstname = $('#firstname').val()
-            var lastname = $('#lastname').val()
-            var email = $('#email').val()
-            var phonenumber = $('#phonenumber').val()
-            var password = $('#password').val()
+        if (valid) {
+            // Capture input values
+            var firstname = $('#firstname').val();
+            var lastname = $('#lastname').val();
+            var email = $('#email').val();
+            var phonenumber = $('#phonenumber').val();
+            var password = $('#password').val();
 
-            
-            Swal.fire({
-                title: 'Hello world',
-                text: 'This is good',
-                icon: 'success'
-            }).then(function(){
-                // After alert is closed, submit the form manually
-                $('#registrationForm').submit();
+            // Make AJAX request
+            $.ajax({
+                type: 'POST',
+                url: 'process.php',
+                data: {
+                    firstname: firstname,
+                    lastname: lastname,
+                    email: email,
+                    phonenumber: phonenumber,
+                    password: password
+                },
+                success: function (data) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: data,
+                        icon: 'success'
+                    }).then(function () {
+                        $('#registrationForm')[0].reset(); // Optional: reset form
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        title: 'Fail',
+                        text: 'User failed to register',
+                        icon: 'error'
+                    });
+                }
             });
-        });
+        } else {
+            alert("Form is not valid. Please fill out all required fields.");
+        }
     });
+});
+
 </script>
 
 </body>
